@@ -364,7 +364,7 @@ const Login = () => {
                   Regenerate OTP
                 </p>
               )}
-              <p class="text-dark pt-2">
+              <p className="text-dark pt-2">
                 Not a Customer Yet?
                 <Link
                   to="/signup"

@@ -4,9 +4,9 @@ const AppContext = createContext();
 
 const AppContextProvider = ({ children }) => {
 // <<<<<<< HEAD
-  // const url = "http://localhost:8012";
+  const url = "http://localhost:8001";
 // =======
-  const url = "https://api.singledebt.in";
+  // const url = "https://api.singledebt.in";
 // >>>>>>> d60c429a3dc3f9b3d34ccebcb85faecae49b0600
   const [user, setUser] = useState(null);
   const [selectedPlanData, setSelectedPlanData] = useState({});
