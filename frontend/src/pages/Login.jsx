@@ -243,7 +243,7 @@ const Login = () => {
             navigate("/hold");
             break;
           case 3:
-            navigate("/offer");
+            navigate("/payment");
             break;
           case 2:
             navigate("/description");

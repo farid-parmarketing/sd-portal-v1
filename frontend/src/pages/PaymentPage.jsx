@@ -6,16 +6,21 @@ import { AppContext } from "../context/AppContext";
 import Usernavbar from "../components/Usernavbar";
 import Hishweta from "../components/Hishweta";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { CgLaptop } from "react-icons/cg";
 
 const PaymentPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { url, getToken, user } = useContext(AppContext);
+  const { url, getToken, user, totalBill } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
 
-  console.log(user);
-
+  // console.log(user);
+  const recordId = localStorage.getItem("recordId");
+  console.log("recordId", recordId);
+  console.log("user.id", user.id);
+  // 532383000161933576  532383000161933576
   // Fetch the data from location or localStorage
   const {
     title: passedTitle,
@@ -44,13 +49,14 @@ const PaymentPage = () => {
     // console.log("Passed One-Time Fee:", passedOneTimeFee);
 
     const paymentStatus = localStorage.getItem("paymentStatus");
+    const totalbil = localStorage.getItem("totalbil");
     if (paymentStatus === "completed") {
       setIsEnrolled(true);
       const currentPlan = JSON.parse(localStorage.getItem("currentPlan"));
       if (currentPlan) {
         setTitle(currentPlan.title);
         setEmi(currentPlan.emi);
-        setOneTimeFee(currentPlan.oneTimeFee);
+        setOneTimeFee(599);
         setCalculatedEMIe(currentPlan.calculatedEMI);
       }
     }
@@ -76,19 +82,22 @@ const PaymentPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            // amount: 1,
             amount: oneTimeFee,
             currency: "INR",
           }),
         }
       );
 
+
       const orderData = await response.json();
       if (!orderData.id) throw new Error("Failed to create Razorpay order");
 
       const options = {
-        // key: "rzp_test_i6at6OINiz1V5I",
+        // key: "rzp_test_urNP0cbIe9N7W6",
         key: "rzp_live_rTeC0Xl72J36OB",
         // key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        // amount: 1,
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Singledebt",
@@ -135,6 +144,7 @@ const PaymentPage = () => {
       JSON.stringify({
         title: title,
         emi: emi,
+        // oneTimeFee: 1,
         oneTimeFee: oneTimeFee,
       })
     );
@@ -167,11 +177,13 @@ const PaymentPage = () => {
   };
 
   const updatePaymentStatusInZoho = async (paymentId, token) => {
-    const recordId = localStorage.getItem("recordId"); // Retrieve the record ID from localStorage
+    const recordId = localStorage.getItem("recordId") || user.id;
+
     if (!recordId) {
-      console.error("No record ID found.");
+      console.error("No record ID found. Cannot update payment status.");
       return; // Early exit if recordId is not available
     }
+
     const getCurrentDate = () => {
       const date = new Date();
       const year = date.getFullYear();
@@ -180,48 +192,57 @@ const PaymentPage = () => {
       return `${year}-${month}-${day}`;
     };
 
+    const data = [
+      {
+        Enroll_Payment_Date: getCurrentDate(),
+        Enroll_Payment_Status: "Paid",
+        Step: "4",
+        Enroll_Payment_ID: paymentId,
+      },
+    ];
+
+    console.log(
+      "Attempting to update Zoho CRM with data:",
+      data,
+      "Record ID:",
+      recordId
+    );
+
     try {
-      // Prepare the data according to the Zoho API specification
-      const response = await fetch(
-        `${url}/proxy?url=https://www.zohoapis.in/crm/v2/Leads/${
-          recordId ? recordId : user.id
-        }`,
+      const response = await axios.put(
+        `${url}/proxy?url=https://www.zohoapis.in/crm/v2/Leads/${recordId}`,
+        data,
         {
-          method: "put",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Zoho-oauthtoken ${token}`,
           },
-          body: JSON.stringify([
-            {
-              Enroll_Payment_Date: getCurrentDate(), // Use YYYY-MM-DD format
-              Enroll_Payment_Status: "Paid", // Updated field name
-              Step: "4", // Ensure Step is a string as per your requirement
-            },
-          ]),
         }
       );
 
-      // Check if the response is OK
-      if (!response.ok)
-        throw new Error("Failed to update payment status in Zoho");
+      if (response.status !== 200) {
+        throw new Error("Failed to update payment status in Zoho CRM");
+      }
 
       console.log("Payment status updated in Zoho successfully");
     } catch (error) {
       console.error("Error updating Zoho:", error);
     }
   };
+
   // gett the data
   const fetchPaymentStatusFromZoho = async (token) => {
     const recordId = localStorage.getItem("recordId");
-    if (!recordId) {
-      console.error("No record ID found.");
-      return null; // Return null if no record ID is found
-    }
+    // if (!recordId) {
+    //   console.error("No record ID found.");
+    //   return null; // Return null if no record ID is found
+    // }
 
     try {
       const response = await fetch(
-        `${url}/proxy?url=https://www.zohoapis.in/crm/v2/Leads/${recordId}`,
+        `${url}/proxy?url=https://www.zohoapis.in/crm/v2/Leads/${
+          recordId || user.id
+        }`,
         {
           method: "GET",
           headers: {
@@ -263,6 +284,8 @@ const PaymentPage = () => {
   return (
     <>
       <Usernavbar />
+
+      {/* {oneTimeFee} */}
       <div className="">
         <div className="container p-2 py-4">
           {/* <div className="bg text-center">
@@ -360,9 +383,9 @@ const PaymentPage = () => {
                     style={{ fontSize: "1.5rem", width: "30px" }}
                   />
                   <span style={{ flex: 1, fontSize: "1rem" }}>
-                    Achieve debt freedom within {paymentStatus
-                              ? paymentStatus.Plan_Type
-                              : passedTitle} months.
+                    Achieve debt freedom within{" "}
+                    {paymentStatus ? paymentStatus.Plan_Type : passedTitle}{" "}
+                    months.
                   </span>
                 </li>
                 <li className="d-flex align-items-center mb-2">
@@ -372,12 +395,12 @@ const PaymentPage = () => {
                   />
                   <span style={{ flex: 1, fontSize: "1rem" }}>
                     Enjoy affordable EMIs—pay only{" "}
-                    {console.log("paymentStatus", paymentStatus)}
+                    {/* {console.log("paymentStatus", paymentStatus)}
                     {console.log(
                       "Monthly_EMI_Payment",
                       user.Monthly_EMI_Payment
                     )}
-                    {console.log("emi", emi)}
+                    {console.log("emi", emi)} */}
                     <strong>
                       ₹
                       {paymentStatus
@@ -489,23 +512,21 @@ const PaymentPage = () => {
                       className="me-2"
                       style={{ width: "50%", fontWeight: "bold" }}
                     >
-                      Monthly EMI:
+                      Total Monthly EMI:
                     </p>
                     <span
                       style={{ flex: 1, fontSize: "1rem", textAlign: "right" }}
                     >
                       {/* {emi || "Please Select Your Plan"} */}
-                      {emi
-                        ? `${
-                            paymentStatus
-                              ? paymentStatus.Monthly_EMI_Payment
-                                ? `₹${Math.round(
-                                    paymentStatus.Monthly_EMI_Payment
-                                  ).toLocaleString()}`
-                                : paymentStatus.Monthly_EMI_Payment
-                              : emi
-                          }`
-                        : "Please Select Your Plan"}
+                      {paymentStatus && paymentStatus.Total_Plan_Amount
+                        ? `₹${Math.round(
+                            paymentStatus.Total_Plan_Amount
+                          ).toLocaleString()}`
+                        : user
+                        ? user.Total_Plan_Amount
+                        : ""}
+                      {/* {console.log("totalBill", totalBill)}
+                      {console.log("calculatedEMI", calculatedEMI)} */}
                     </span>
                   </li>
                   <li

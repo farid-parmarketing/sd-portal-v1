@@ -9,6 +9,7 @@ const AppContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [selectedPlanData, setSelectedPlanData] = useState({});
   const [newUser, setNewUser] = useState(null);
+  const [totalBill, setTotalBill] = useState();
   
 
   //
@@ -25,7 +26,7 @@ const AppContextProvider = ({ children }) => {
     }
   };
   return (
-    <AppContext.Provider value={{ url, user, setUser, getToken ,selectedPlanData, setSelectedPlanData,newUser, setNewUser}}>
+    <AppContext.Provider value={{ url, user, setUser, getToken ,selectedPlanData, setSelectedPlanData,newUser, setNewUser,totalBill, setTotalBill}}>
       {children}
     </AppContext.Provider>
   );

@@ -120,7 +120,7 @@ import axios from "axios";
 const Card = ({ title, emi, fee, oneTimeFee, total, unsecured ,Plan }) => {
   const [token, setToken] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const { url, getToken, user } = useContext(AppContext);
+  const { url, getToken, user,setTotalBill } = useContext(AppContext);
   const [isHovered, setIsHovered] = useState(false); // Track hover state
 
   // const calculatedEMI = unsecured
@@ -136,11 +136,14 @@ const Card = ({ title, emi, fee, oneTimeFee, total, unsecured ,Plan }) => {
 
   // Convert all relevant values to numbers and compute total
   const totalbil =
-    calculatedEMI + parseFloat(subscription) + parseFloat(oneTimeFee || 0); // Calculate total by adding EMI, subscription, and one-time fee
+    calculatedEMI + parseFloat(subscription) ; // Calculate total by adding EMI, subscription, and one-time fee
 
   localStorage.setItem("calculatedEMI", calculatedEMI);
   localStorage.setItem("subscription", subscription);
-  localStorage.setItem("totalbil", totalbil);
+  setTotalBill(Math.round(totalbil).toString())
+console.log(Math.round(totalbil).toString());
+
+  
 
   // Function to update payment information in Zoho CRM
   const updateZohoCRM = async () => {
@@ -643,7 +646,7 @@ const Card = ({ title, emi, fee, oneTimeFee, total, unsecured ,Plan }) => {
               </button>
             </div>
           )}
-          <span>Total:</span>
+          <span>Total Monthly EMI:</span>
           <strong>₹{Math.round(totalbil)}</strong>
         </div>
 

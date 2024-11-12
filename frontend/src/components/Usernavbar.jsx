@@ -117,9 +117,9 @@ const Usernavbar = () => {
           </Link>
         </div>
         <div className="d-flex align-items-center justify-content-between gap-2">
-          <Link to="/help" className="button">
+          {/* <Link to="/help" className="button">
             Help & Support
-          </Link>
+          </Link> */}
           <button className="button" onClick={openLogoutModal}>
             <FaPowerOff />
           </button>
