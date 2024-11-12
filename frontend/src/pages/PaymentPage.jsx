@@ -86,8 +86,8 @@ const PaymentPage = () => {
       if (!orderData.id) throw new Error("Failed to create Razorpay order");
 
       const options = {
-        key: "rzp_test_i6at6OINiz1V5I",
-        // key: "rzp_live_rTeC0Xl72J36OB",
+        // key: "rzp_test_i6at6OINiz1V5I",
+        key: "rzp_live_rTeC0Xl72J36OB",
         // key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
@@ -360,7 +360,9 @@ const PaymentPage = () => {
                     style={{ fontSize: "1.5rem", width: "30px" }}
                   />
                   <span style={{ flex: 1, fontSize: "1rem" }}>
-                    Achieve debt freedom within {passedTitle} months.
+                    Achieve debt freedom within {paymentStatus
+                              ? paymentStatus.Plan_Type
+                              : passedTitle} months.
                   </span>
                 </li>
                 <li className="d-flex align-items-center mb-2">
