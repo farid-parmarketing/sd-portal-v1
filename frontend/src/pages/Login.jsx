@@ -115,7 +115,6 @@ const Login = () => {
         );
 
         const userData = res.data?.data?.[0];
-        console.log(userData);
 
         if (userData) {
           const recordId = userData.id;
@@ -364,7 +363,7 @@ const Login = () => {
                   Regenerate OTP
                 </p>
               )}
-              <p class="text-dark pt-2">
+              <p className="text-dark pt-2">
                 Not a Customer Yet?
                 <Link
                   to="/signup"

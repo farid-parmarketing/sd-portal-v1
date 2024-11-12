@@ -312,11 +312,11 @@ const SignUp = () => {
                 </>
               )}
             </button>
-            <p class="text-dark pt-2">
+            <p className="text-dark pt-2">
               Already a Customer?
               <Link
                 to="/login"
-                class="fw-bold fs-6 text-danger text-decoration-none ms-2 me-2"
+                className="fw-bold fs-6 text-danger text-decoration-none ms-2 me-2"
               >
                 Login Here
               </Link>
