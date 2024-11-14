@@ -117,6 +117,7 @@ const Proceed = () => {
       EMI_Payments: totalEMIRef.current.value,
       Harassment_Type: harassmentTypeRef.current.value,
       Legal_Status: legalActionRef.current.value,
+      Step :1,
     });
     setIsModalOpen(true);
   };
