@@ -14,6 +14,7 @@ const Proceed = () => {
   const totalEMIRef = useRef();
   const harassmentTypeRef = useRef();
   const legalActionRef = useRef();
+  const missedemiRef = useRef();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
@@ -71,7 +72,13 @@ const Proceed = () => {
   //   { label: "Other", value: "other" },
   // ];
 
-  const harassmentOptions = [
+  const missedemi = [
+    { label: "Yes",value: "Yes" },
+    { label: "No", value: "No" },
+  ];
+
+
+const harassmentOptions = [
     { label: "Yes",value: "Yes" },
     { label: "No", value: "No" },
   ];
@@ -117,6 +124,7 @@ const Proceed = () => {
       EMI_Payments: totalEMIRef.current.value,
       Harassment_Type: harassmentTypeRef.current.value,
       Legal_Status: legalActionRef.current.value,
+      Missed_Payment:missedemiRef.current.value,
       Step :1,
     });
     setIsModalOpen(true);
@@ -297,8 +305,36 @@ const Proceed = () => {
                 <span className="tooltip-icon">
                   <span style={{ fontWeight: "bold" }}> i</span>
                   <span className="tooltip-text">
-                    The total monthly EMI required for all unsecured debts,
-                    including credit cards and personal loans.
+                  Please specify if you have missed any EMI payments in the last 3 months.
+                  </span>
+                </span>
+              </div>
+
+              <div style={{ position: "relative", marginBottom: "10px" }}>
+                <select
+                  style={inputStyle}
+                  ref={missedemiRef}
+                  required
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                  Misses EMI in last 3 Months
+
+                  </option>
+                  {missedemi
+                    .filter((option) => option.value) // Filter out the first placeholder option from the array
+                    .map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                </select>
+                <span className="tooltip-icon">
+                  <span style={{ fontWeight: "bold" }}> i</span>
+                  <span className="tooltip-text">
+                    Describe the type(s) of harassment you are facing from
+                    creditors (e.g., repeated phone calls, messages, unannounced
+                    visits). Include all relevant forms of harassment.
                   </span>
                 </span>
               </div>
